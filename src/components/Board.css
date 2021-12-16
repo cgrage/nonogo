@@ -1,0 +1,75 @@
+.board {
+    display: table;
+    font-size: 1.0em;
+    padding: 0;
+    margin: 0;
+}
+
+.board .row {
+    display: table-row;
+}
+
+.board .header-row {
+    display: table-row;
+}
+
+.board .tile {
+    display: table-cell;
+    width: 2.0em;
+    height: 2.0em;
+    border: white 1px solid;
+}
+
+.board .tile-free {
+    background-color: fuchsia;
+}
+
+.board .tile-crossed {
+    background-color: turquoise;
+}
+
+.board .tile-filled {
+    background-color: tomato;
+}
+
+.board .tile:hover {
+    background-color: yellow;
+}
+
+.board .column-header {
+    display: table-cell;
+    vertical-align: bottom;
+}
+
+.board .row-header {
+    display: table-cell;
+}
+
+.board .top-left-cell {
+    background-color: cadetblue;
+    display: table-cell;
+}
+
+.board .column-hints {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.board .row-hints {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding: 0;
+    margin: 0;
+}
+
+.board .hint-tile {
+    background-color: peachpuff;
+    width: 2.0em;
+    height: 2.0em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: white 1px solid;
+}
