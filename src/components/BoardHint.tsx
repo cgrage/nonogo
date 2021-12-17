@@ -2,6 +2,8 @@ import React from 'react';
 
 type HintProps = {
     value: number;
+    colIndex: number;
+    rowIndex: number;
 }
 
 type HintState = {
@@ -15,7 +17,10 @@ class BoardTile extends React.Component<HintProps, HintState> {
     }
 
     render() {
-        return <div className="hint-tile">{this.props.value}</div>;
+        return <div
+            className={`hint-tile`}>
+            {this.props.value}
+        </div>;
     }
 }
 

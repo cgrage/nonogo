@@ -24,19 +24,18 @@ class BoardTile extends React.Component<TileProps, TileState> {
         }
     }
 
-    classNameByState() {
+    valueClass() {
         switch (this.props.value) {
-            case TileUserVal.Free:
-                return "tile tile-free";
-            case TileUserVal.Crossed:
-                return "tile tile-crossed";
-            case TileUserVal.Filled:
-                return "tile tile-filled";
+            case TileUserVal.Free: return "tile-free";
+            case TileUserVal.Crossed: return "tile-crossed";
+            case TileUserVal.Filled: return "tile-filled";
         }
     }
 
     render() {
-        return <div className={this.classNameByState()} onClick={this.onClick}></div>;
+        return <div
+            className={`tile ${this.valueClass()}`}
+            onClick={this.onClick}>X</div>;
     }
 }
 
