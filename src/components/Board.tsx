@@ -1,40 +1,51 @@
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState, MouseEvent } from 'react';
 import BoardTile from './BoardTile';
-import { TileUserVal, TileTargetVal, loadBoard, emptyBoard, updateOnTileEvent } from './BoardStuff';
+import BoardStuff, { TileUserVal, TileTargetVal, HintSet } from './BoardStuff';
 import BoardHint from './BoardHint';
 import './Board.css'
+import TitleTile from './TitleTile';
 
 const Board: FunctionComponent = () => {
+    let loaded = BoardStuff.loadBoard();
 
-    function onTileEvent(colIndex: number, rowIndex: number) {
-        // console.log("Tile Event on (" + rowIndex + ", " + colIndex + ")");
-        setTileStates(prevState => updateOnTileEvent(prevState, colIndex, rowIndex));
+    const [tileSolutions] = useState<TileTargetVal[][]>(loaded.solution);
+    const [colHints] = useState<HintSet[]>(loaded.colHints);
+    const [rowHints] = useState<HintSet[]>(loaded.rowHints);
+    const [tileStates, setTileStates] = useState<TileUserVal[][]>(BoardStuff.emptyBoard(loaded));
+    const [hideSums, setHideSums] = useState<boolean>(true);
+
+    function onMouseDown(e: MouseEvent<HTMLDivElement>) {
+        e.preventDefault();
     }
 
-    let loaded = loadBoard();
+    function onTileEvent(colIndex: number, rowIndex: number) {
+        setTileStates(prevState => BoardStuff.updateOnTileEvent(prevState, colIndex, rowIndex));
+    }
 
-    const [tileSolutions] = useState<TileTargetVal[][]>(loaded.tiles);
-    const [colHints] = useState<number[][]>(loaded.colHints);
-    const [rowHints] = useState<number[][]>(loaded.rowHints);
-    const [tileStates, setTileStates] = useState<TileUserVal[][]>(emptyBoard(loaded));
+    function onTitleClick() {
+        setTileStates(prevState => BoardStuff.giveHint(prevState));
+        setHideSums(false);
+    }
 
-    return <div className="board">
+    return <div className="board" onMouseDown={onMouseDown}>
         <div className={`col header-col`}></div>
-        {colHints.map((colHintSet, colIndex) => 
-            <div className={`col mod${colIndex % 5}`}></div>
+        {colHints.map((colHintSet, colIndex) =>
+            <div className={`col mod${colIndex % 5}`} key={colIndex.toString()} />
         )}
         <div className={`row header-row`}>
-            <div className="cell top-left-cell"></div>
+            <TitleTile onGiveHint={onTitleClick} />
             {colHints.map((colHintSet, colIndex) =>
                 <div className="cell column-header-cell" key={colIndex.toString()}>
                     <div className="column-hints">
-                        {colHintSet.map((hint, hintIndex) =>
+                        {colHintSet.hints.map((hint, hintIndex) =>
                             <BoardHint
                                 key={hintIndex.toString()}
-                                rowIndex={-1}
-                                colIndex={colIndex}
                                 value={hint} />
                         )}
+                        <BoardHint
+                            isSum={true}
+                            isHidden={hideSums}
+                            value={colHintSet.sum} />
                     </div>
                 </div>
             )}
@@ -43,19 +54,20 @@ const Board: FunctionComponent = () => {
             <div className={`row mod${rowIndex % 5}`} key={rowIndex.toString()}>
                 <div className="cell row-header-cell">
                     <div className="row-hints">
-                        {rowHints[rowIndex].map((hint, hintIndex) =>
+                        {rowHints[rowIndex].hints.map((hint, hintIndex) =>
                             <BoardHint
                                 key={hintIndex.toString()}
-                                rowIndex={rowIndex}
-                                colIndex={-1}
                                 value={hint} />
                         )}
+                        <BoardHint
+                            isSum={true}
+                            isHidden={hideSums}
+                            value={rowHints[rowIndex].sum} />
                     </div>
                 </div>
                 {row.map((tileState, colIndex) =>
-                    <div className="cell">
+                    <div className="cell" key={rowIndex + " " + colIndex}>
                         <BoardTile
-                            key={rowIndex + " " + colIndex}
                             value={tileState}
                             rowIndex={rowIndex}
                             colIndex={colIndex}

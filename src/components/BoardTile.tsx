@@ -1,14 +1,14 @@
 import React from 'react';
 import { TileUserVal } from './BoardStuff';
 
-type TileProps = {
+interface TileProps {
     value: TileUserVal;
     colIndex: number;
     rowIndex: number;
     onTileEvent: CallableFunction;
 };
 
-type TileState = {
+interface TileState {
     //
 };
 
@@ -35,7 +35,7 @@ class BoardTile extends React.Component<TileProps, TileState> {
     render() {
         return <div
             className={`tile ${this.valueClass()}`}
-            onClick={this.onClick}>X</div>;
+            onClick={this.onClick}></div>;
     }
 }
 

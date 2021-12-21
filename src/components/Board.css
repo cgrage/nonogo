@@ -1,8 +1,7 @@
 .board {
     display: table;
     font-size: 1.0em;
-    border-collapse: separate;
-    border-spacing: 1px;
+    border-collapse: collapse;
 }
 
 .board .row {
@@ -17,40 +16,16 @@
     display: table-cell;
 }
 
-.board .tile {
-    width: 2.0em;
-    height: 2.0em;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.board .tile-free {
-    background-color: fuchsia;
-}
-
-.board .tile-crossed {
-    background-color: turquoise;
-}
-
-.board .tile-filled {
-    background-color: tomato;
-}
-
-.board .tile:hover {
-    background-color: yellow;
-}
-
 .board .column-header-cell {
     vertical-align: bottom;
 }
 
 .board .row-header-cell {
-    align-items: flex-end;
+    vertical-align: top;
 }
 
 .board .top-left-cell {
-    background-color: cadetblue;
+    padding: 1em;
 }
 
 .board .column-hints {
@@ -67,8 +42,31 @@
     margin: 0;
 }
 
+.board .tile {
+    width: 2.0em;
+    height: 2.0em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.board .tile-free {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.board .tile-crossed {
+    background-color: turquoise;
+}
+
+.board .tile-filled {
+    background-color: tomato;
+}
+
+.board .tile:hover {
+    background-color: yellow;
+}
+
 .board .hint-tile {
-    background-color: peachpuff;
+    background-color: rgba(32, 22, 13, 0.1);
     width: 2.0em;
     height: 2.0em;
     display: flex;
@@ -76,10 +74,24 @@
     align-items: center;
 }
 
-.board .row.mod4 {
-    height: 2.2em;
+.board .hint-tile.sum {
+    background-color: rgba(255, 119, 0, 0.4);
 }
 
-.board .col.mod4 {
-    width: 2.2em;    
+.board .hint-tile.hidden {
+    display: none;
+}
+
+.board .row.mod0 {
+    border-top: 3px solid transparent;
+}
+
+/*
+.board .row:hover>.cell {
+    background-color: greenyellow;
+}
+*/
+
+.board .col.mod0 {
+    border-left: 3px solid transparent;
 }

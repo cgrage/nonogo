@@ -1,27 +1,43 @@
 import React from 'react';
 
-type HintProps = {
+interface HintProps {
     value: number;
-    colIndex: number;
-    rowIndex: number;
+    isSum: boolean;
+    isFulfilled: boolean;
+    isHidden: boolean;
 }
 
-type HintState = {
+interface HintState {
     // 
 };
 
-class BoardTile extends React.Component<HintProps, HintState> {
+class BoardHint extends React.Component<HintProps, HintState> {
+    public static defaultProps = {
+        isSum: false,
+        isFulfilled: false,
+        isHidden: false
+    };
+
     constructor(props: HintProps) {
         super(props)
         this.state = {};
     }
 
+    class() {
+        var result = "hint-tile";
+        if (this.props.isSum) result += " sum";
+        if (this.props.isFulfilled) result += " fulfilled";
+        if (this.props.isHidden) result += " hidden";
+
+        return result;
+    }
+
     render() {
         return <div
-            className={`hint-tile`}>
-            {this.props.value}
+            className={this.class()}>
+            {this.props.isSum ? "=" : ""}{this.props.value}
         </div>;
     }
 }
 
-export default BoardTile
+export default BoardHint
