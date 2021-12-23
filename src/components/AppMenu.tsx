@@ -11,6 +11,7 @@ interface SettingsProps {
     onClose: () => void;
     onSettingsChange: (newSettings: AppSettings) => void;
     onGiveHint: () => void;
+    onReset: () => void;
 }
 
 const SettingsPage: React.FC<SettingsProps> = (props) => {
@@ -26,6 +27,10 @@ const SettingsPage: React.FC<SettingsProps> = (props) => {
                 props.onGiveHint();
                 props.onClose();
             }}>Give Hint</button></div>
+            <div><button onClick={() => {
+                props.onReset();
+                props.onClose();
+            }}>Reset</button></div>
             <div><button onClick={() => props.onClose()}>Close</button></div>
         </div>
     </>

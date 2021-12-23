@@ -25,10 +25,9 @@ export type BoardData = {
     rowHints: HintSet[];
 }
 
-
 class BoardStuff {
 
-    public static loadBoard(): BoardData {
+    public static load(): BoardData {
         return BoardStuff.loadJson();
     }
 
@@ -106,18 +105,29 @@ class BoardStuff {
         return loaded;
     }
 
-    public static emptyBoard(data: BoardData): TileUserVal[][] {
+    public static reset(board: TileUserVal[][]): TileUserVal[][] {
         let empty: TileUserVal[][] = [];
-        for (let y = 0; y < data.height; y++) {
+        for (let y = 0; y < board.length; y++) {
             empty[y] = [];
-            for (let x = 0; x < data.width; x++) {
+            for (let x = 0; x < board[y].length; x++) {
                 empty[y][x] = TileUserVal.Free;
             }
         }
         return empty;
     }
 
-    public static cloneBoard(board: TileUserVal[][]): TileUserVal[][] {
+    public static new(width: number, height: number): TileUserVal[][] {
+        let empty: TileUserVal[][] = [];
+        for (let y = 0; y < height; y++) {
+            empty[y] = [];
+            for (let x = 0; x < width; x++) {
+                empty[y][x] = TileUserVal.Free;
+            }
+        }
+        return empty;
+    }
+
+    public static clone(board: TileUserVal[][]): TileUserVal[][] {
         let clone: TileUserVal[][] = [];
         for (let y = 0; y < board.length; y++) {
             clone[y] = [];
@@ -138,14 +148,14 @@ class BoardStuff {
             case TileUserVal.Crossed: newVal = TileUserVal.Free; break;
         }
 
-        let newBoard = BoardStuff.cloneBoard(board);
+        let newBoard = BoardStuff.clone(board);
         newBoard[rowIndex][colIndex] = newVal;
 
         return newBoard;
     }
 
-    public static giveHint(board: TileUserVal[][]): TileUserVal[][] {
-        let clone = BoardStuff.cloneBoard(board);
+    public static hint(board: TileUserVal[][]): TileUserVal[][] {
+        let clone = BoardStuff.clone(board);
         for (let y = 0; y < board.length; y++) {
             for (let x = 0; x < board[y].length; x++) {
                 clone[y][x] = TileUserVal.Crossed;

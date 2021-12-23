@@ -1,4 +1,4 @@
-import { FunctionComponent, useState, MouseEvent } from 'react';
+import React, { useState, MouseEvent, useImperativeHandle, forwardRef } from 'react';
 import BoardTile from './BoardTile';
 import BoardStuff, { TileUserVal, TileTargetVal, HintSet } from './BoardStuff';
 import BoardHint from './BoardHint';
@@ -9,13 +9,18 @@ interface BoardProps {
     onOpenMenu: () => void;
 }
 
-const Board: React.FC<BoardProps> = (props) => {
-    let loaded = BoardStuff.loadBoard();
+export interface BoardRef {
+    giveHint(): void;
+    reset(): void;
+}
+
+const Board: React.ForwardRefRenderFunction<BoardRef, BoardProps> = (props, ref) => {
+    let loaded = BoardStuff.load();
 
     const [tileSolutions] = useState<TileTargetVal[][]>(loaded.solution);
     const [colHints] = useState<HintSet[]>(loaded.colHints);
     const [rowHints] = useState<HintSet[]>(loaded.rowHints);
-    const [tileStates, setTileStates] = useState<TileUserVal[][]>(BoardStuff.emptyBoard(loaded));
+    const [tileStates, setTileStates] = useState<TileUserVal[][]>(BoardStuff.new(loaded.width, loaded.height));
 
     function onMouseDown(e: MouseEvent<HTMLDivElement>) {
         e.preventDefault();
@@ -24,6 +29,11 @@ const Board: React.FC<BoardProps> = (props) => {
     function onTileEvent(colIndex: number, rowIndex: number) {
         setTileStates(prevState => BoardStuff.updateOnTileEvent(prevState, colIndex, rowIndex));
     }
+
+    useImperativeHandle(ref, () => ({
+        giveHint: () => { setTileStates(prevState => BoardStuff.hint(prevState)); },
+        reset: () => { setTileStates(prevState => BoardStuff.reset(prevState)); }
+    }), [])
 
     return <div className="board" onMouseDown={onMouseDown}>
         <div className={`col header-col`}></div>
@@ -77,4 +87,4 @@ const Board: React.FC<BoardProps> = (props) => {
     </div>
 }
 
-export default Board
+export default forwardRef(Board)
