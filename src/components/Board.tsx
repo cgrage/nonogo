@@ -2,17 +2,20 @@ import { FunctionComponent, useState, MouseEvent } from 'react';
 import BoardTile from './BoardTile';
 import BoardStuff, { TileUserVal, TileTargetVal, HintSet } from './BoardStuff';
 import BoardHint from './BoardHint';
-import './Board.css'
 import TitleTile from './TitleTile';
 
-const Board: FunctionComponent = () => {
+interface BoardProps {
+    showSums: boolean;
+    onOpenMenu: () => void;
+}
+
+const Board: React.FC<BoardProps> = (props) => {
     let loaded = BoardStuff.loadBoard();
 
     const [tileSolutions] = useState<TileTargetVal[][]>(loaded.solution);
     const [colHints] = useState<HintSet[]>(loaded.colHints);
     const [rowHints] = useState<HintSet[]>(loaded.rowHints);
     const [tileStates, setTileStates] = useState<TileUserVal[][]>(BoardStuff.emptyBoard(loaded));
-    const [hideSums, setHideSums] = useState<boolean>(true);
 
     function onMouseDown(e: MouseEvent<HTMLDivElement>) {
         e.preventDefault();
@@ -22,18 +25,13 @@ const Board: FunctionComponent = () => {
         setTileStates(prevState => BoardStuff.updateOnTileEvent(prevState, colIndex, rowIndex));
     }
 
-    function onTitleClick() {
-        setTileStates(prevState => BoardStuff.giveHint(prevState));
-        setHideSums(false);
-    }
-
     return <div className="board" onMouseDown={onMouseDown}>
         <div className={`col header-col`}></div>
         {colHints.map((colHintSet, colIndex) =>
             <div className={`col mod${colIndex % 5}`} key={colIndex.toString()} />
         )}
         <div className={`row header-row`}>
-            <TitleTile onGiveHint={onTitleClick} />
+            <TitleTile onOpenMenu={props.onOpenMenu} />
             {colHints.map((colHintSet, colIndex) =>
                 <div className="cell column-header-cell" key={colIndex.toString()}>
                     <div className="column-hints">
@@ -44,7 +42,7 @@ const Board: FunctionComponent = () => {
                         )}
                         <BoardHint
                             isSum={true}
-                            isHidden={hideSums}
+                            isHidden={!props.showSums}
                             value={colHintSet.sum} />
                     </div>
                 </div>
@@ -61,7 +59,7 @@ const Board: FunctionComponent = () => {
                         )}
                         <BoardHint
                             isSum={true}
-                            isHidden={hideSums}
+                            isHidden={!props.showSums}
                             value={rowHints[rowIndex].sum} />
                     </div>
                 </div>

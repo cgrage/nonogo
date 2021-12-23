@@ -1,24 +1,14 @@
 import React from 'react';
-import { TileUserVal } from './BoardStuff';
 
 type TitleTileProps = {
-    onGiveHint: CallableFunction;
+    onOpenMenu: () => void;
 };
 
-type TitleTileState = {
-    //
-};
-
-class TitleTile extends React.Component<TitleTileProps, TitleTileState> {
-    constructor(props: TitleTileProps) {
-        super(props)
-    }
-
-    render() {
-        return <div className="cell top-left-cell">
-            <h1 onClick={(e) => this.props.onGiveHint()}>Nonogo!</h1>
-        </div>
-    }
+const TitleTile: React.FC<TitleTileProps> = (props) => {
+    return <div className="cell top-left-cell">
+        <h1>Nonogo!</h1>
+        <button onClick={(e) => props.onOpenMenu()}>Menu</button>
+    </div>
 }
 
 export default TitleTile;

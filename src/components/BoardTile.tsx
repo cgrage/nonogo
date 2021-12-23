@@ -5,38 +5,27 @@ interface TileProps {
     value: TileUserVal;
     colIndex: number;
     rowIndex: number;
-    onTileEvent: CallableFunction;
+    onTileEvent: (col: number, row: number) => void;
 };
 
-interface TileState {
-    //
-};
-
-class BoardTile extends React.Component<TileProps, TileState> {
-    constructor(props: TileProps) {
-        super(props)
-        this.onClick = this.onClick.bind(this);
-    }
-
-    onClick(e: React.MouseEvent) {
-        if (this.props.onTileEvent) {
-            this.props.onTileEvent(this.props.colIndex, this.props.rowIndex);
+const BoardTile: React.FC<TileProps> = (props) => {
+    function onClick(e: React.MouseEvent) {
+        if (props.onTileEvent) {
+            props.onTileEvent(props.colIndex, props.rowIndex);
         }
     }
 
-    valueClass() {
-        switch (this.props.value) {
+    function valueClass() {
+        switch (props.value) {
             case TileUserVal.Free: return "tile-free";
             case TileUserVal.Crossed: return "tile-crossed";
             case TileUserVal.Filled: return "tile-filled";
         }
     }
 
-    render() {
-        return <div
-            className={`tile ${this.valueClass()}`}
-            onClick={this.onClick}></div>;
-    }
+    return <div
+        className={`tile ${valueClass()}`}
+        onClick={onClick}></div>;
 }
 
 export default BoardTile;
