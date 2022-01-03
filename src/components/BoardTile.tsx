@@ -1,8 +1,8 @@
 import React from 'react';
-import { TileUserVal } from './BoardStuff';
+import { UserFieldValue, FieldValue } from './PuzzleCalc';
 
 interface TileProps {
-    value: TileUserVal;
+    value: UserFieldValue;
     colIndex: number;
     rowIndex: number;
     onTileEvent: (col: number, row: number) => void;
@@ -15,16 +15,26 @@ const BoardTile: React.FC<TileProps> = (props) => {
         }
     }
 
-    function valueClass() {
-        switch (props.value) {
-            case TileUserVal.Free: return "tile-free";
-            case TileUserVal.Crossed: return "tile-crossed";
-            case TileUserVal.Filled: return "tile-filled";
+    function className(): string {
+        let value = "tile";
+
+        if (props.value.value === undefined) {
+            value += " free";
+        } else if (props.value.value === FieldValue.Free) {
+            value += " crossed";
+        } else {
+            value += " filled";
         }
+
+        if (props.value.hasError) {
+            value += " error"
+        }
+
+        return value
     }
 
     return <div
-        className={`tile ${valueClass()}`}
+        className={className()}
         onClick={onClick}></div>;
 }
 

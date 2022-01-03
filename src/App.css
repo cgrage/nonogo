@@ -54,20 +54,24 @@
     align-items: center;
 }
 
-.board .tile-free {
+.board .tile.free {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-.board .tile-crossed {
+.board .tile.crossed {
     background-color: turquoise;
 }
 
-.board .tile-filled {
+.board .tile.filled {
     background-color: tomato;
 }
 
 .board .tile:hover {
     background-color: yellow;
+}
+
+.board .tile.error {
+    background-color: red;
 }
 
 .board .hint-tile {
@@ -88,17 +92,28 @@
 }
 
 .board .row.mod0 {
-    border-top: 3px solid transparent;
+    border-top: 2px solid transparent;
 }
 
-/*
-.board .row:hover>.cell {
-    background-color: greenyellow;
+.board .row.mod4 {
+    border-bottom: 2px solid transparent;
 }
-*/
 
 .board .col.mod0 {
-    border-left: 3px solid transparent;
+    border-left: 2px solid transparent;
+}
+
+.board .col.mod4 {
+    border-right: 2px solid transparent;
+}
+
+.board .row:hover {
+    background-color: greenyellow;
+}
+
+.board .col:hover {
+    background-color: greenyellow;
+    z-index:0;
 }
 
 .hide {

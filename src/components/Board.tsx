@@ -1,6 +1,6 @@
 import React, { useState, MouseEvent, useImperativeHandle, forwardRef } from 'react';
 import BoardTile from './BoardTile';
-import BoardStuff, { TileUserVal, TileTargetVal, HintSet } from './BoardStuff';
+import PuzzleCalc, { UserFieldValue, FieldValue, HintSet } from './PuzzleCalc';
 import BoardHint from './BoardHint';
 import TitleTile from './TitleTile';
 
@@ -15,24 +15,24 @@ export interface BoardRef {
 }
 
 const Board: React.ForwardRefRenderFunction<BoardRef, BoardProps> = (props, ref) => {
-    let loaded = BoardStuff.load();
+    let loaded = PuzzleCalc.load();
 
-    const [tileSolutions] = useState<TileTargetVal[][]>(loaded.solution);
+    const [tileSolutions] = useState<FieldValue[][]>(loaded.solution);
     const [colHints] = useState<HintSet[]>(loaded.colHints);
     const [rowHints] = useState<HintSet[]>(loaded.rowHints);
-    const [tileStates, setTileStates] = useState<TileUserVal[][]>(BoardStuff.new(loaded.width, loaded.height));
+    const [tileStates, setTileStates] = useState<UserFieldValue[][]>(PuzzleCalc.new(loaded.width, loaded.height));
 
     function onMouseDown(e: MouseEvent<HTMLDivElement>) {
         e.preventDefault();
     }
 
     function onTileEvent(colIndex: number, rowIndex: number) {
-        setTileStates(prevState => BoardStuff.updateOnTileEvent(prevState, colIndex, rowIndex));
+        setTileStates(prevState => PuzzleCalc.updateOnTileEvent(prevState, colIndex, rowIndex));
     }
 
     useImperativeHandle(ref, () => ({
-        giveHint: () => { setTileStates(prevState => BoardStuff.hint(prevState)); },
-        reset: () => { setTileStates(prevState => BoardStuff.reset(prevState)); }
+        giveHint: () => { setTileStates(prevState => PuzzleCalc.hint(prevState, loaded)); },
+        reset: () => { setTileStates(prevState => PuzzleCalc.reset(prevState)); }
     }), [])
 
     return <div className="board" onMouseDown={onMouseDown}>
