@@ -1,33 +1,47 @@
 import React from 'react';
-import { UserFieldValue, FieldValue } from './PuzzleCalc';
+import { CellValue, Colors } from './PuzzleCalc';
 
 interface TileProps {
-    value: UserFieldValue;
+    value: CellValue;
     colIndex: number;
     rowIndex: number;
-    onTileEvent: (col: number, row: number) => void;
+    isSelected: boolean;
+    onInteract: (col: number, row: number) => void;
+    onSelected: (col: number, row: number) => void;
 };
 
 const BoardTile: React.FC<TileProps> = (props) => {
-    function onClick(e: React.MouseEvent) {
-        if (props.onTileEvent) {
-            props.onTileEvent(props.colIndex, props.rowIndex);
+    function onMouseDown(e: React.MouseEvent) {
+        if (props.onInteract) {
+            props.onInteract(props.colIndex, props.rowIndex);
+        }
+    }
+    
+    function onMouseEnter(e: React.MouseEvent) {
+        if (props.onSelected) {
+            props.onSelected(props.colIndex, props.rowIndex);
         }
     }
 
     function className(): string {
         let value = "tile";
 
-        if (props.value.value === undefined) {
-            value += " free";
-        } else if (props.value.value === FieldValue.Free) {
-            value += " crossed";
+        if (props.value.input === undefined) {
+            value += " empty";
         } else {
-            value += " filled";
+            if (props.value.input === Colors.Free) {
+                value += " guess-free";
+            } else {
+                value += " guess-filled";
+            }
         }
 
         if (props.value.hasError) {
-            value += " error"
+            value += " error";
+        }
+
+        if (props.isSelected) {
+            value += " selected";
         }
 
         return value
@@ -35,7 +49,8 @@ const BoardTile: React.FC<TileProps> = (props) => {
 
     return <div
         className={className()}
-        onClick={onClick}></div>;
+        onMouseDown={onMouseDown}
+        onMouseEnter={onMouseEnter}></div>;
 }
 
 export default BoardTile;

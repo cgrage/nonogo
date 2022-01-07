@@ -1,21 +1,23 @@
 
 import Puzzle from '../puzzles/json/one.json';
 
-export enum FieldValue {
-    Free = 0,
-    Color1 = 1,
-    Color2 = 2,
-    Color3 = 3,
-    Color4 = 4,
-    Color5 = 5,
-    Color6 = 6,
-    Color7 = 7,
-    Color8 = 8,
-    Color9 = 9,
-}
+export const Colors = {
+    Free: 0,
+    Color1: 1,
+    Color2: 2,
+    Color3: 3,
+    Color4: 4,
+    Color5: 5,
+    Color6: 6,
+    Color7: 7,
+    Color8: 8,
+    Color9: 9,
+} as const;
 
-export type UserFieldValue = {
-    value?: FieldValue,
+export type FieldColor = typeof Colors[keyof typeof Colors];
+
+export type CellValue = {
+    input: FieldColor | undefined,
     hasError: boolean,
 }
 
@@ -27,7 +29,7 @@ export type HintSet = {
 export type PuzzleData = {
     width: number;
     height: number;
-    solution: FieldValue[][];
+    solution: FieldColor[][];
     colHints: HintSet[];
     rowHints: HintSet[];
 }
@@ -57,7 +59,21 @@ class PuzzleCalc {
         for (let y = 0; y < loaded.height; y++) {
             loaded.solution[y] = [];
             for (let x = 0; x < loaded.width; x++) {
-                loaded.solution[y][x] = FieldValue.Free;
+                loaded.solution[y][x] = function (x: string): FieldColor {
+                    switch (x) {
+                        case "0": return Colors.Free;
+                        default:
+                        case "1": return Colors.Color1;
+                        case "2": return Colors.Color2;
+                        case "3": return Colors.Color3;
+                        case "4": return Colors.Color4;
+                        case "5": return Colors.Color5;
+                        case "6": return Colors.Color6;
+                        case "7": return Colors.Color7;
+                        case "8": return Colors.Color8;
+                        case "9": return Colors.Color9;
+                    }
+                }(Puzzle.goal.charAt(y * loaded.width + x));
             }
         }
 
@@ -92,7 +108,7 @@ class PuzzleCalc {
         for (let y = 0; y < loaded.height; y++) {
             loaded.solution[y] = [];
             for (let x = 0; x < loaded.width; x++) {
-                loaded.solution[y][x] = FieldValue.Free;
+                loaded.solution[y][x] = Colors.Free;
             }
         }
 
@@ -117,61 +133,64 @@ class PuzzleCalc {
         return loaded;
     }
 
-    public static reset(board: UserFieldValue[][]): UserFieldValue[][] {
+    public static reset(board: CellValue[][]): CellValue[][] {
         for (let y = 0; y < board.length; y++) {
             for (let x = 0; x < board[y].length; x++) {
                 board[y][x] = {
-                    value: undefined,
+                    input: undefined,
                     hasError: false,
-                }
+                };
             }
         }
         return board;
     }
 
-    public static new(width: number, height: number): UserFieldValue[][] {
-        let empty: UserFieldValue[][] = [];
+    public static new(width: number, height: number): CellValue[][] {
+        let empty: CellValue[][] = [];
         for (let y = 0; y < height; y++) {
             empty[y] = [];
             for (let x = 0; x < width; x++) {
                 empty[y][x] = {
-                    value: undefined,
+                    input: undefined,
                     hasError: false,
-                }
+                };
             }
         }
         return empty;
     }
 
-    public static clone(board: UserFieldValue[][]): UserFieldValue[][] {
-        let clone: UserFieldValue[][] = [];
+    public static clone(board: CellValue[][]): CellValue[][] {
+        let clone: CellValue[][] = [];
         for (let y = 0; y < board.length; y++) {
             clone[y] = [];
             for (let x = 0; x < board[y].length; x++) {
-                clone[y][x] = board[y][x];
+                clone[y][x] = {
+                    input: board[y][x].input,
+                    hasError: board[y][x].hasError,
+                };
             }
         }
         return clone;
     }
 
-    public static updateOnTileEvent(board: UserFieldValue[][], colIndex: number, rowIndex: number): UserFieldValue[][] {
-        let tileVal = board[rowIndex][colIndex];
+    public static updateOnTileEvent(board: CellValue[][], colIndex: number, rowIndex: number): CellValue[][] {
+        let tileVal = board[rowIndex][colIndex].input;
 
-        if (tileVal.value === undefined) {
-            tileVal.value = FieldValue.Color1;
-        } else if (tileVal.value === FieldValue.Free) {
-            tileVal.value = undefined;
+        if (tileVal === undefined) {
+            tileVal = Colors.Color1;
+        } else if (tileVal === Colors.Free) {
+            tileVal = undefined;
         } else {
-            tileVal.value = FieldValue.Free;
+            tileVal = Colors.Free;
         }
 
         let newBoard = PuzzleCalc.clone(board);
-        newBoard[rowIndex][colIndex] = tileVal;
+        newBoard[rowIndex][colIndex].input = tileVal;
 
         return newBoard;
     }
 
-    static findErrors(board: UserFieldValue[][], puzzle: PuzzleData): ErrorMap {
+    static findErrors(board: CellValue[][], puzzle: PuzzleData): ErrorMap {
         let map: ErrorMap = {
             hasError: [],
             errorCount: 0,
@@ -180,7 +199,7 @@ class PuzzleCalc {
         for (let y = 0; y < puzzle.height; y++) {
             map.hasError[y] = [];
             for (let x = 0; x < puzzle.width; x++) {
-                let hasError = (board[y][x].value !== undefined) && (board[y][x].value !== puzzle.solution[y][x]);
+                let hasError = (board[y][x].input !== undefined) && (board[y][x].input !== puzzle.solution[y][x]);
                 map.hasError[y][x] = hasError;
                 if (hasError) {
                     map.errorCount++;
@@ -191,7 +210,7 @@ class PuzzleCalc {
         return map;
     }
 
-    static markRandomError(map: ErrorMap, board: UserFieldValue[][], puzzle: PuzzleData) {
+    static markRandomError(map: ErrorMap, board: CellValue[][], puzzle: PuzzleData) {
         if (map.errorCount < 1) {
             return;
         }
@@ -205,7 +224,15 @@ class PuzzleCalc {
         }
     }
 
-    public static hint(board: UserFieldValue[][], puzzle: PuzzleData): UserFieldValue[][] {
+    static showRandomSolution(board: CellValue[][], puzzle: PuzzleData) {
+        for (let y = 0; y < puzzle.height; y++) {
+            for (let x = 0; x < puzzle.width; x++) {
+                board[y][x].input = puzzle.solution[y][x];
+            }
+        }
+    }
+
+    public static hint(board: CellValue[][], puzzle: PuzzleData): CellValue[][] {
         board = PuzzleCalc.clone(board);
         let errors = this.findErrors(board, puzzle);
 
@@ -214,7 +241,9 @@ class PuzzleCalc {
                 this.markRandomError(errors, board, puzzle);
             }
         } else {
-
+            for (let i = 0; i < 3; i++) {
+                this.showRandomSolution(board, puzzle);
+            }
         }
 
         return board;

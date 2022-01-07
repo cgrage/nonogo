@@ -1,6 +1,6 @@
-import React, { useState, MouseEvent, useImperativeHandle, forwardRef } from 'react';
+import React, { useState, useImperativeHandle, forwardRef } from 'react';
 import BoardTile from './BoardTile';
-import PuzzleCalc, { UserFieldValue, FieldValue, HintSet } from './PuzzleCalc';
+import PuzzleCalc, { CellValue, PuzzleData } from './PuzzleCalc';
 import BoardHint from './BoardHint';
 import TitleTile from './TitleTile';
 
@@ -14,35 +14,37 @@ export interface BoardRef {
     reset(): void;
 }
 
+type Coord2d = {
+    x: number,
+    y: number,
+}
+
 const Board: React.ForwardRefRenderFunction<BoardRef, BoardProps> = (props, ref) => {
-    let loaded = PuzzleCalc.load();
+    const [puzzle] = useState<PuzzleData>(PuzzleCalc.load());
+    const [tileStates, setTileStates] = useState<CellValue[][]>(PuzzleCalc.new(puzzle.width, puzzle.height));
+    const [selCell, setSelCell] = useState<Coord2d>({ x: -1, y: -1 });
 
-    const [tileSolutions] = useState<FieldValue[][]>(loaded.solution);
-    const [colHints] = useState<HintSet[]>(loaded.colHints);
-    const [rowHints] = useState<HintSet[]>(loaded.rowHints);
-    const [tileStates, setTileStates] = useState<UserFieldValue[][]>(PuzzleCalc.new(loaded.width, loaded.height));
-
-    function onMouseDown(e: MouseEvent<HTMLDivElement>) {
-        e.preventDefault();
-    }
-
-    function onTileEvent(colIndex: number, rowIndex: number) {
+    function onTileInteract(colIndex: number, rowIndex: number) {
         setTileStates(prevState => PuzzleCalc.updateOnTileEvent(prevState, colIndex, rowIndex));
     }
 
+    function onSelected(colIndex: number, rowIndex: number) {
+        setSelCell({ x: colIndex, y: rowIndex });
+    }
+
     useImperativeHandle(ref, () => ({
-        giveHint: () => { setTileStates(prevState => PuzzleCalc.hint(prevState, loaded)); },
+        giveHint: () => { setTileStates(prevState => PuzzleCalc.hint(prevState, puzzle)); },
         reset: () => { setTileStates(prevState => PuzzleCalc.reset(prevState)); }
     }), [])
 
-    return <div className="board" onMouseDown={onMouseDown}>
+    return <div className="board">
         <div className={`col header-col`}></div>
-        {colHints.map((colHintSet, colIndex) =>
-            <div className={`col mod${colIndex % 5}`} key={colIndex.toString()} />
+        {puzzle.colHints.map((colHintSet, colIndex) =>
+            <div className={`col mod${colIndex % 5} ${colIndex == selCell.x ? "highlight" : ""}`} key={colIndex.toString()} />
         )}
         <div className={`row header-row`}>
             <TitleTile onOpenMenu={props.onOpenMenu} />
-            {colHints.map((colHintSet, colIndex) =>
+            {puzzle.colHints.map((colHintSet, colIndex) =>
                 <div className="cell column-header-cell" key={colIndex.toString()}>
                     <div className="column-hints">
                         {colHintSet.hints.map((hint, hintIndex) =>
@@ -59,10 +61,10 @@ const Board: React.ForwardRefRenderFunction<BoardRef, BoardProps> = (props, ref)
             )}
         </div>
         {tileStates.map((row, rowIndex) =>
-            <div className={`row mod${rowIndex % 5}`} key={rowIndex.toString()}>
+            <div className={`row mod${rowIndex % 5} ${rowIndex == selCell.y ? "highlight" : ""}`} key={rowIndex.toString()}>
                 <div className="cell row-header-cell">
                     <div className="row-hints">
-                        {rowHints[rowIndex].hints.map((hint, hintIndex) =>
+                        {puzzle.rowHints[rowIndex].hints.map((hint, hintIndex) =>
                             <BoardHint
                                 key={hintIndex.toString()}
                                 value={hint} />
@@ -70,7 +72,7 @@ const Board: React.ForwardRefRenderFunction<BoardRef, BoardProps> = (props, ref)
                         <BoardHint
                             isSum={true}
                             isHidden={!props.showSums}
-                            value={rowHints[rowIndex].sum} />
+                            value={puzzle.rowHints[rowIndex].sum} />
                     </div>
                 </div>
                 {row.map((tileState, colIndex) =>
@@ -79,7 +81,9 @@ const Board: React.ForwardRefRenderFunction<BoardRef, BoardProps> = (props, ref)
                             value={tileState}
                             rowIndex={rowIndex}
                             colIndex={colIndex}
-                            onTileEvent={onTileEvent} />
+                            isSelected={colIndex == selCell.x && rowIndex == selCell.y}
+                            onInteract={onTileInteract}
+                            onSelected={onSelected} />
                     </div>
                 )}
             </div>

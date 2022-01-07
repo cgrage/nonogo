@@ -4,7 +4,7 @@
 
 .board {
     display: table;
-    font-size: 1.0em;
+    font-size: 0.9em;
     border-collapse: collapse;
 }
 
@@ -18,6 +18,7 @@
 
 .board .cell {
     display: table-cell;
+    vertical-align: top;
 }
 
 .board .column-header-cell {
@@ -46,28 +47,32 @@
     margin: 0;
 }
 
-.board .tile {
-    width: 2.0em;
-    height: 2.0em;
+.board .tile,
+.board .hint-tile,
+.board .tile.selected::after {
+    width: 1.3em;
+    height: 1.3em;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.board .tile.free {
-    background-color: rgba(255, 255, 255, 0.1);
+.board .tile.empty {
+    background-color: rgba(255, 255, 255, 0.75);
 }
 
-.board .tile.crossed {
-    background-color: turquoise;
+.board .tile.guess-free {
+    background-color: rgba(128, 128, 128, 0.75);
 }
 
-.board .tile.filled {
-    background-color: tomato;
+.board .tile.guess-filled {
+    background-color: rgba(0, 0, 0, 0.75);
 }
 
-.board .tile:hover {
-    background-color: yellow;
+.board .tile.selected::after {
+    content: "";
+    position: absolute;
+    border: 3px solid hotpink;
 }
 
 .board .tile.error {
@@ -76,11 +81,6 @@
 
 .board .hint-tile {
     background-color: rgba(32, 22, 13, 0.1);
-    width: 2.0em;
-    height: 2.0em;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .board .hint-tile.sum {
@@ -91,29 +91,25 @@
     display: none;
 }
 
-.board .row.mod0 {
+.board .row {
     border-top: 2px solid transparent;
 }
 
-.board .row.mod4 {
-    border-bottom: 2px solid transparent;
+.board .row.mod0 {
+    border-top: 3px solid transparent;
 }
 
-.board .col.mod0 {
+.board .col {
     border-left: 2px solid transparent;
 }
 
-.board .col.mod4 {
-    border-right: 2px solid transparent;
+.board .col.mod0 {
+    border-left: 3px solid transparent;
 }
 
-.board .row:hover {
-    background-color: greenyellow;
-}
-
-.board .col:hover {
-    background-color: greenyellow;
-    z-index:0;
+.board .row.highlight,
+.board .col.highlight {
+    background: hotpink;
 }
 
 .hide {
