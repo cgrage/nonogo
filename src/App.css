@@ -33,13 +33,13 @@
     padding: 1em;
 }
 
-.board .column-hints {
+.board .column-clues {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
 }
 
-.board .row-hints {
+.board .row-clues {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
@@ -48,13 +48,14 @@
 }
 
 .board .tile,
-.board .hint-tile,
+.board .clue-tile,
 .board .tile.selected::after {
     width: 1.3em;
     height: 1.3em;
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 }
 
 .board .tile.empty {
@@ -79,15 +80,16 @@
     background-color: red;
 }
 
-.board .hint-tile {
+.board .clue-tile {
     background-color: rgba(32, 22, 13, 0.1);
 }
 
-.board .hint-tile.sum {
+.board .clue-tile.sum {
     background-color: rgba(255, 119, 0, 0.4);
+    cursor: default;
 }
 
-.board .hint-tile.hidden {
+.board .clue-tile.hidden {
     display: none;
 }
 

@@ -1,5 +1,6 @@
 
-import Puzzle from '../puzzles/json/one.json';
+// import jsonPuzzle from '../puzzles/json/one.json';
+import srcedPuzzle from '../puzzles/json/hardy.json';
 
 export const Colors = {
     Free: 0,
@@ -21,17 +22,18 @@ export type CellValue = {
     hasError: boolean,
 }
 
-export type HintSet = {
-    hints: number[];
+export type ClueSet = {
+    clues: number[];
     sum: number;
 }
 
 export type PuzzleData = {
+    name: string;
     width: number;
     height: number;
     solution: FieldColor[][];
-    colHints: HintSet[];
-    rowHints: HintSet[];
+    colClues: ClueSet[];
+    rowClues: ClueSet[];
 }
 
 type ErrorMap = {
@@ -46,14 +48,15 @@ class PuzzleCalc {
     }
 
     public static loadJson(): PuzzleData {
-        let width = Puzzle.width;
-        let height = Puzzle.height;
+        let width = srcedPuzzle.width;
+        let height = srcedPuzzle.height;
         let loaded: PuzzleData = {
+            name: srcedPuzzle.title,
             width: width,
             height: height,
             solution: [],
-            colHints: [],
-            rowHints: [],
+            colClues: [],
+            rowClues: [],
         }
 
         for (let y = 0; y < loaded.height; y++) {
@@ -73,23 +76,23 @@ class PuzzleCalc {
                         case "8": return Colors.Color8;
                         case "9": return Colors.Color9;
                     }
-                }(Puzzle.goal.charAt(y * loaded.width + x));
+                }(srcedPuzzle.goal.charAt(y * loaded.width + x));
             }
         }
 
         for (let col = 0; col < width; col++) {
-            loaded.colHints[col] = { hints: [], sum: 0 };
-            for (let i = 0; i < Puzzle.columns[col].length; i++) {
-                loaded.colHints[col].hints[i] = Puzzle.columns[col][i];
-                loaded.colHints[col].sum += Puzzle.columns[col][i];
+            loaded.colClues[col] = { clues: [], sum: 0 };
+            for (let i = 0; i < srcedPuzzle.columns[col].length; i++) {
+                loaded.colClues[col].clues[i] = srcedPuzzle.columns[col][i];
+                loaded.colClues[col].sum += srcedPuzzle.columns[col][i];
             }
         }
 
         for (let row = 0; row < height; row++) {
-            loaded.rowHints[row] = { hints: [], sum: 0 };
-            for (let i = 0; i < Puzzle.rows[row].length; i++) {
-                loaded.rowHints[row].hints[i] = Puzzle.rows[row][i];
-                loaded.rowHints[row].sum += Puzzle.rows[row][i];
+            loaded.rowClues[row] = { clues: [], sum: 0 };
+            for (let i = 0; i < srcedPuzzle.rows[row].length; i++) {
+                loaded.rowClues[row].clues[i] = srcedPuzzle.rows[row][i];
+                loaded.rowClues[row].sum += srcedPuzzle.rows[row][i];
             }
         }
 
@@ -98,11 +101,12 @@ class PuzzleCalc {
 
     public static loadEmpty(): PuzzleData {
         let loaded: PuzzleData = {
+            name: "EMPTY",
             width: 32,
             height: 32,
             solution: [],
-            colHints: [],
-            rowHints: [],
+            colClues: [],
+            rowClues: [],
         }
 
         for (let y = 0; y < loaded.height; y++) {
@@ -112,21 +116,21 @@ class PuzzleCalc {
             }
         }
 
-        loaded.colHints = [];
+        loaded.colClues = [];
         for (let x = 0; x < loaded.width; x++) {
             switch (x % 3) {
-                case 0: loaded.colHints[x] = { hints: [1, 2, 3], sum: 6 }; break;
-                case 1: loaded.colHints[x] = { hints: [1, 2], sum: 3 }; break;
-                case 2: loaded.colHints[x] = { hints: [1], sum: 1 }; break;
+                case 0: loaded.colClues[x] = { clues: [1, 2, 3], sum: 6 }; break;
+                case 1: loaded.colClues[x] = { clues: [1, 2], sum: 3 }; break;
+                case 2: loaded.colClues[x] = { clues: [1], sum: 1 }; break;
             }
         }
 
-        loaded.rowHints = [];
+        loaded.rowClues = [];
         for (let y = 0; y < loaded.width; y++) {
             switch (y % 3) {
-                case 0: loaded.rowHints[y] = { hints: [10, 20, 30], sum: 60 }; break;
-                case 1: loaded.rowHints[y] = { hints: [10, 20], sum: 30 }; break;
-                case 2: loaded.rowHints[y] = { hints: [10], sum: 10 }; break;
+                case 0: loaded.rowClues[y] = { clues: [10, 20, 30], sum: 60 }; break;
+                case 1: loaded.rowClues[y] = { clues: [10, 20], sum: 30 }; break;
+                case 2: loaded.rowClues[y] = { clues: [10], sum: 10 }; break;
             }
         }
 

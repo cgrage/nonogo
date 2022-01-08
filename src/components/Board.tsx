@@ -1,7 +1,7 @@
-import React, { useState, useImperativeHandle, forwardRef } from 'react';
+import React, { useState, MouseEvent, useImperativeHandle, forwardRef } from 'react';
 import BoardTile from './BoardTile';
 import PuzzleCalc, { CellValue, PuzzleData } from './PuzzleCalc';
-import BoardHint from './BoardHint';
+import ClueTile from './ClueTile';
 import TitleTile from './TitleTile';
 
 interface BoardProps {
@@ -24,6 +24,10 @@ const Board: React.ForwardRefRenderFunction<BoardRef, BoardProps> = (props, ref)
     const [tileStates, setTileStates] = useState<CellValue[][]>(PuzzleCalc.new(puzzle.width, puzzle.height));
     const [selCell, setSelCell] = useState<Coord2d>({ x: -1, y: -1 });
 
+    function onMouseDown(e: MouseEvent<HTMLDivElement>) {
+        e.preventDefault();
+    }
+
     function onTileInteract(colIndex: number, rowIndex: number) {
         setTileStates(prevState => PuzzleCalc.updateOnTileEvent(prevState, colIndex, rowIndex));
     }
@@ -35,44 +39,44 @@ const Board: React.ForwardRefRenderFunction<BoardRef, BoardProps> = (props, ref)
     useImperativeHandle(ref, () => ({
         giveHint: () => { setTileStates(prevState => PuzzleCalc.hint(prevState, puzzle)); },
         reset: () => { setTileStates(prevState => PuzzleCalc.reset(prevState)); }
-    }), [])
+    }), [puzzle])
 
-    return <div className="board">
+    return <div className="board" onMouseLeave={() => onSelected(-1, -1)} onMouseDown={onMouseDown}>
         <div className={`col header-col`}></div>
-        {puzzle.colHints.map((colHintSet, colIndex) =>
-            <div className={`col mod${colIndex % 5} ${colIndex == selCell.x ? "highlight" : ""}`} key={colIndex.toString()} />
+        {puzzle.colClues.map((colClueSet, colIndex) =>
+            <div className={`col mod${colIndex % 5} ${colIndex === selCell.x ? "highlight" : ""}`} key={colIndex.toString()} />
         )}
         <div className={`row header-row`}>
-            <TitleTile onOpenMenu={props.onOpenMenu} />
-            {puzzle.colHints.map((colHintSet, colIndex) =>
+            <TitleTile title={puzzle.name} onOpenMenu={props.onOpenMenu} />
+            {puzzle.colClues.map((colClueSet, colIndex) =>
                 <div className="cell column-header-cell" key={colIndex.toString()}>
-                    <div className="column-hints">
-                        {colHintSet.hints.map((hint, hintIndex) =>
-                            <BoardHint
-                                key={hintIndex.toString()}
-                                value={hint} />
+                    <div className="column-clues">
+                        {colClueSet.clues.map((clue, clueIndex) =>
+                            <ClueTile
+                                key={clueIndex.toString()}
+                                value={clue} />
                         )}
-                        <BoardHint
+                        <ClueTile
                             isSum={true}
                             isHidden={!props.showSums}
-                            value={colHintSet.sum} />
+                            value={colClueSet.sum} />
                     </div>
                 </div>
             )}
         </div>
         {tileStates.map((row, rowIndex) =>
-            <div className={`row mod${rowIndex % 5} ${rowIndex == selCell.y ? "highlight" : ""}`} key={rowIndex.toString()}>
+            <div className={`row mod${rowIndex % 5} ${rowIndex === selCell.y ? "highlight" : ""}`} key={rowIndex.toString()}>
                 <div className="cell row-header-cell">
-                    <div className="row-hints">
-                        {puzzle.rowHints[rowIndex].hints.map((hint, hintIndex) =>
-                            <BoardHint
-                                key={hintIndex.toString()}
-                                value={hint} />
+                    <div className="row-clues">
+                        {puzzle.rowClues[rowIndex].clues.map((clue, clueIndex) =>
+                            <ClueTile
+                                key={clueIndex.toString()}
+                                value={clue} />
                         )}
-                        <BoardHint
+                        <ClueTile
                             isSum={true}
                             isHidden={!props.showSums}
-                            value={puzzle.rowHints[rowIndex].sum} />
+                            value={puzzle.rowClues[rowIndex].sum} />
                     </div>
                 </div>
                 {row.map((tileState, colIndex) =>
@@ -81,7 +85,7 @@ const Board: React.ForwardRefRenderFunction<BoardRef, BoardProps> = (props, ref)
                             value={tileState}
                             rowIndex={rowIndex}
                             colIndex={colIndex}
-                            isSelected={colIndex == selCell.x && rowIndex == selCell.y}
+                            isSelected={colIndex === selCell.x && rowIndex === selCell.y}
                             onInteract={onTileInteract}
                             onSelected={onSelected} />
                     </div>

@@ -1,15 +1,15 @@
 import React from 'react';
 
-interface HintProps {
+interface ClueTimeProps {
     value: number;
     isSum?: boolean;
     isFulfilled?: boolean;
     isHidden?: boolean;
 }
 
-const BoardHint: React.FC<HintProps> = (props) => {
+const ClueTile: React.FC<ClueTimeProps> = (props) => {
     function getClass() {
-        var result = "hint-tile";
+        var result = "clue-tile";
         if (props.isSum) result += " sum";
         if (props.isFulfilled) result += " fulfilled";
         if (props.isHidden) result += " hidden";
@@ -17,16 +17,13 @@ const BoardHint: React.FC<HintProps> = (props) => {
         return result;
     }
 
-    return <div
-        className={getClass()}>
-        {props.isSum ? "=" : ""}{props.value}
-    </div>;
+    return <div className={getClass()}>{props.value}</div>;
 }
 
-BoardHint.defaultProps = {
+ClueTile.defaultProps = {
     isSum: false,
     isFulfilled: false,
     isHidden: false
 };
 
-export default BoardHint
+export default ClueTile
