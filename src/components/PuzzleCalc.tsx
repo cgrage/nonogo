@@ -1,40 +1,7 @@
+import { CellValue, ClueSet, Colors, FieldValue, PuzzleData } from './Types';
 
 // import jsonPuzzle from '../puzzles/json/one.json';
 import srcedPuzzle from '../puzzles/json/hardy.json';
-
-export const Colors = {
-    Free: 0,
-    Color1: 1,
-    Color2: 2,
-    Color3: 3,
-    Color4: 4,
-    Color5: 5,
-    Color6: 6,
-    Color7: 7,
-    Color8: 8,
-    Color9: 9,
-} as const;
-
-export type FieldColor = typeof Colors[keyof typeof Colors];
-
-export type CellValue = {
-    input: FieldColor | undefined,
-    hasError: boolean,
-}
-
-export type ClueSet = {
-    clues: number[];
-    sum: number;
-}
-
-export type PuzzleData = {
-    name: string;
-    width: number;
-    height: number;
-    solution: FieldColor[][];
-    colClues: ClueSet[];
-    rowClues: ClueSet[];
-}
 
 type ErrorMap = {
     hasError: boolean[][];
@@ -62,7 +29,7 @@ class PuzzleCalc {
         for (let y = 0; y < loaded.height; y++) {
             loaded.solution[y] = [];
             for (let x = 0; x < loaded.width; x++) {
-                loaded.solution[y][x] = function (x: string): FieldColor {
+                loaded.solution[y][x] = function (x: string): FieldValue {
                     switch (x) {
                         case "0": return Colors.Free;
                         default:
@@ -251,6 +218,52 @@ class PuzzleCalc {
         }
 
         return board;
+    }
+
+    public static solveStep(board: CellValue[][], puzzle: PuzzleData): CellValue[][] {
+        board = PuzzleCalc.clone(board);
+
+        for (let i = 0; i < puzzle.width; i++) {
+            this.solveColumn(board, puzzle, i);
+        }
+
+        return board;
+    }
+
+    public static solveColumn(board: CellValue[][], puzzle: PuzzleData, col: number) {
+
+        function get(i: number): FieldValue {
+            return board[i][col].input;
+        }
+
+        function put(i: number, val: FieldValue): void {
+            board[i][col].input = val;
+        }
+
+        this.solveLine(get, put, puzzle.height, puzzle.colClues[col]);
+    }
+
+    public static solveLine(lineRead: { (i: number): FieldValue }, lineWrite: { (i: number, val: FieldValue): void }, length: number, clueSet: ClueSet): void {
+
+        // special case: no clues
+        if (clueSet.clues.length < 1) {
+            for (let i = 0; i < length; i++) {
+                lineWrite(i, Colors.Free);
+            }
+        }
+
+        // special: single clue with value 0
+        if (clueSet.clues.length == 1 && clueSet.clues[0] === 0) {
+            for (let i = 0; i < length; i++) {
+                lineWrite(i, Colors.Free);
+            }
+        }
+
+        // special case: line is fully filled
+        let sumWithDiv = clueSet.sum + clueSet.clues.length - 1;
+        if (sumWithDiv === length) {
+            
+        }
     }
 }
 

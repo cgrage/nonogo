@@ -1,5 +1,5 @@
 import React from 'react';
-import { CellValue, Colors } from './PuzzleCalc';
+import { CellValue, Colors } from './Types';
 
 interface TileProps {
     value: CellValue;

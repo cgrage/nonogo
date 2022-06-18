@@ -1,8 +1,9 @@
 import React, { useState, MouseEvent, useImperativeHandle, forwardRef } from 'react';
 import BoardTile from './BoardTile';
-import PuzzleCalc, { CellValue, PuzzleData } from './PuzzleCalc';
+import PuzzleCalc from './PuzzleCalc';
 import ClueTile from './ClueTile';
 import TitleTile from './TitleTile';
+import { CellValue, PuzzleData } from './Types';
 
 interface BoardProps {
     showSums: boolean;
@@ -37,7 +38,7 @@ const Board: React.ForwardRefRenderFunction<BoardRef, BoardProps> = (props, ref)
     }
 
     useImperativeHandle(ref, () => ({
-        giveHint: () => { setTileStates(prevState => PuzzleCalc.hint(prevState, puzzle)); },
+        giveHint: () => { setTileStates(prevState => PuzzleCalc.solveStep(prevState, puzzle)); },
         reset: () => { setTileStates(prevState => PuzzleCalc.reset(prevState)); }
     }), [puzzle])
 
